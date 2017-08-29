@@ -56,14 +56,17 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     float vy = x_state(3);
 
     //check division by zero
+    if(fabs(px) < 0.0001 and fabs(py) < 0.0001){
+        cout << "CalculateJacobian () - Error - Division by Zero" << endl;
+        px = 0.0001;
+        py = 0.0001;
+    }
 
     //compute the Jacobian matrix
     double pow_addition = px*px + py*py;
 
-    //check division by zero
-    if(fabs(pow_addition) < 0.0001){
-        cout << "CalculateJacobian () - Error - Division by Zero" << endl;
-        return Hj;
+    if(fabs(pow_addition) < 0.0000001){
+        pow_addition = 0.0000001;
     }
 
     double temp_x = px/(sqrt(pow_addition));

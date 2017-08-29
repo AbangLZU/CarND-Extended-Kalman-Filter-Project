@@ -67,6 +67,12 @@ public:
      */
     void UpdateEKF(const Eigen::VectorXd &z);
 
+    /**
+     * calculate the S, K, x, P
+     * @param y the error
+     */
+    void KF(Eigen::VectorXd &y);
+
 };
 
 #endif /* KALMAN_FILTER_H_ */

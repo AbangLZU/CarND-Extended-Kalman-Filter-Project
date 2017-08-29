@@ -77,9 +77,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
             /**
             Convert radar from polar to cartesian coordinates and initialize state.
             */
-            float px = measurement_pack.raw_measurements_[0] * cos(measurement_pack.raw_measurements_[1]);
-            float py = measurement_pack.raw_measurements_[0] * sin(measurement_pack.raw_measurements_[1]);
-            ekf_.x_ << px, py, 0, 0;
+            float rho = measurement_pack.raw_measurements_[0];
+            float phi = measurement_pack.raw_measurements_[1];
+            float rho_dot = measurement_pack.raw_measurements_[2];
+            float px = rho * cos(phi);
+            float py = rho * sin(phi);
+            float vx = rho_dot * cos(phi);
+            float vy = rho_dot * sin(phi);
+            ekf_.x_ << px, py, vx, vy;
 
         } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
             /**
@@ -111,8 +116,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
             0, 0, 1, 0,
             0, 0, 0, 1;
 
-    int noise_ax = 9;
-    int noise_ay = 9;
+    float noise_ax = 9.0;
+    float noise_ay = 9.0;
     ekf_.Q_ << (dt*dt*dt*dt/4.) * noise_ax, 0, (dt*dt*dt/2.) * noise_ax, 0,
             0, (dt*dt*dt*dt/4.) * noise_ay, 0, (dt*dt*dt/2.) * noise_ay,
             (dt*dt*dt/2.) * noise_ax, 0, dt*dt*noise_ax, 0,
