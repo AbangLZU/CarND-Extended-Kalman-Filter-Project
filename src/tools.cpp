@@ -12,7 +12,6 @@ Tools::~Tools() {}
 VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
                               const vector<VectorXd> &ground_truth) {
   /**
-  TODO:
     * Calculate the RMSE here.
   */
     VectorXd rmse(4);
@@ -45,7 +44,6 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   /**
-  TODO:
     * Calculate a Jacobian here.
   */
     MatrixXd Hj(3,4);
@@ -55,18 +53,18 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     float vx = x_state(2);
     float vy = x_state(3);
 
-    //check division by zero
-    if(fabs(px) < 0.0001 and fabs(py) < 0.0001){
-        cout << "CalculateJacobian () - Error - Division by Zero" << endl;
-        px = 0.0001;
-        py = 0.0001;
-    }
-
     //compute the Jacobian matrix
     double pow_addition = px*px + py*py;
 
+    //check division by zero
     if(fabs(pow_addition) < 0.0000001){
-        pow_addition = 0.0000001;
+        cout << "CalculateJacobian () - Error - Division by Zero" << endl;
+        float big = 1e15;
+        Hj << big, big, 0, 0,
+                -big, big, 0, 0,
+                big, big, big, big;
+
+        return Hj;
     }
 
     double temp_x = px/(sqrt(pow_addition));
