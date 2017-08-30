@@ -54,10 +54,13 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     float vy = x_state(3);
 
     //compute the Jacobian matrix
-    double pow_addition = px*px + py*py;
+    //pre-compute a set of terms to avoid repeated calculation
+    float c1 = px*px+py*py;
+    float c2 = sqrt(c1);
+    float c3 = (c1*c2);
 
     //check division by zero
-    if(fabs(pow_addition) < 0.0000001){
+    if(fabs(c1) < 0.0000001){
         cout << "CalculateJacobian () - Error - Division by Zero" << endl;
         float big = 1e15;
         Hj << big, big, 0, 0,
@@ -67,11 +70,17 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
         return Hj;
     }
 
-    double temp_x = px/(sqrt(pow_addition));
-    double temp_y = py/(sqrt(pow_addition));
-    Hj << temp_x, temp_y, 0, 0,
-            -py/(pow_addition), px/(pow_addition), 0, 0,
-            py * (vx*py - vy*px)/(pow(pow_addition, 3/2)), px * (vy*px - vx*py)/(pow(pow_addition, 3/2)), temp_x, temp_y;
+    //compute the Jacobian matrix
+    Hj << (px/c2), (py/c2), 0, 0,
+            -(py/c1), (px/c1), 0, 0,
+            py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+
+
+//    double temp_x = px/(sqrt(pow_addition));
+//    double temp_y = py/(sqrt(pow_addition));
+//    Hj << temp_x, temp_y, 0, 0,
+//            -py/(pow_addition), px/(pow_addition), 0, 0,
+//            py * (vx*py - vy*px)/(pow(pow_addition, 3/2)), px * (vy*px - vx*py)/(pow(pow_addition, 3/2)), temp_x, temp_y;
 
 
     return Hj;
